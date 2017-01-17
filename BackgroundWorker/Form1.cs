@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+
+using System.Configuration;
 
 namespace BackgroundWorkerSample
 {
@@ -102,6 +106,22 @@ namespace BackgroundWorkerSample
                 MessageBox.Show("処理が完了しました。");
             }
             this.Enabled = true;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo(".\\70c07400.jpg");
+            try
+            {
+                using (Process pProcess = Process.Start(startInfo.Exe, startInfo.Parameters))
+                {
+                    pProcess.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
