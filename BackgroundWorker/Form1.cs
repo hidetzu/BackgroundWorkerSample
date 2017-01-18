@@ -11,6 +11,7 @@ using System.Windows.Forms;
 
 
 using System.Configuration;
+using System.Runtime.InteropServices;
 
 namespace BackgroundWorkerSample
 {
@@ -122,6 +123,26 @@ namespace BackgroundWorkerSample
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void dllCallback(int ret);
+
+        [DllImport("DLLSample.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "add")] // .NetFramework4.0
+        public static extern double Add(double a, double b);
+
+        [DllImport("DLLSample.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "start_thread")] // .NetFramework4.0
+        private static extern void start_thread(dllCallback commpleteCallback);
+
+        private void resCallback(System.Int32 ret)
+        {
+            MessageBox.Show(string.Format("{0}です。", ret));
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            start_thread(resCallback);
+            MessageBox.Show("処理中");
         }
     }
 }
