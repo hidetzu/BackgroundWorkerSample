@@ -131,8 +131,15 @@ namespace BackgroundWorkerSample
         [DllImport("DLLSample.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "add")] // .NetFramework4.0
         public static extern double Add(double a, double b);
 
+        [StructLayout(LayoutKind.Sequential)]
+        private struct AccessContext
+        {
+            public int idx;
+            public dllCallback callback;
+        }
+
         [DllImport("DLLSample.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "start_thread")] // .NetFramework4.0
-        private static extern void start_thread(dllCallback commpleteCallback);
+        private static extern void start_thread(ref AccessContext accessContext);
 
         private void resCallback(System.Int32 ret)
         {
@@ -141,8 +148,32 @@ namespace BackgroundWorkerSample
 
         private void button3_Click(object sender, EventArgs e)
         {
-            start_thread(resCallback);
-            MessageBox.Show("処理中");
+            AccessContext context = new AccessContext() {
+                idx = 10,
+                callback = resCallback
+            };
+
+            start_thread(ref context);
+            Console.WriteLine("idx={0}", context.idx);
+            //MessageBox.Show("処理中");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var imagePath = ".\\70c07400.jpg";
+            var exe = ConfigurationManager.AppSettings["paint"];
+            try
+            {
+                using (Process pProcess = Process.Start(exe, imagePath))
+                {
+                    pProcess.WaitForExit();
+                }
+                var a = 10;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
